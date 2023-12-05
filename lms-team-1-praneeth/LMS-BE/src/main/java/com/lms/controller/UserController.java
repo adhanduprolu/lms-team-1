@@ -107,7 +107,13 @@ public class UserController {
 					img = output.get().getName().substring(0, 2).toUpperCase();
 				}
 
-				UserCoursesDto uc = lus.getCourseUsers(output.get().getName());
+				UserCoursesDto uc = null;
+				try {
+					uc = lus.getCourseUsers(output.get().getName());
+
+				} catch (Exception e) {
+
+				}
 
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
