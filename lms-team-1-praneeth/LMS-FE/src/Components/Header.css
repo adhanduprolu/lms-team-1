@@ -1,3 +1,40 @@
-.h3{
-cursor: pointer;
+.profile-popup{
+    position: absolute;
+    display: none;
+    text-align: left;
+    border: 1px solid gray;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 5px;
+    width: 170px;
+    right: 10px;
+    
+   
+}
+.position-relative{
+    cursor: pointer;
+}
+.profile-popup p{
+    margin: 0;
+    padding: 10px 20px;
+    padding-right: 30px;
+    border-radius: 2px;
+
+}
+.profile-popup p:hover{
+    color: white;
+    background-color: rgb(95, 143, 233);
+    border-radius: 10px;
+}
+.profile:hover .profile-popup{
+    display: flex;
+    flex-direction: column;
+    top: 70px;
+    right: 30px;
+}
+.position-relative:hover .profile-popup {
+    display: flex;
+    flex-direction: column;
+    top: 55px;
+   
 }

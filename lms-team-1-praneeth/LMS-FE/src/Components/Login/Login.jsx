@@ -26,13 +26,10 @@ const Login = () => {
     console.log("state:", state);
     return state.login.email;
   });
-  const password = useSelector((state) => state.login.password);
   const jwt = useSelector((state) => state.login.jwt);
   const userRole = useSelector((state) => state.login.role);
   const userName = useSelector((state) => state.login.name);
   console.log("role:", userRole);
-  console.log("jwt:", jwt);
-  console.log("pw :", password);
   console.log("name :", userName);
   //FORM HANDLING AND GETTING INPUT DATA FROM USER
   const handleChange = (e) => {
@@ -72,15 +69,15 @@ const Login = () => {
       // }
       // fetchUserId();
       ////////////////////////////
-      if (userRole === "admin") {
-        // window.cookies.set("cook", jwt);
-        return navigate("/admindashboard");
-      } else if (userRole === "user") {
+      if (userRole === "admin" || userRole === "user") {
         // window.cookies.set("cook", jwt);
         return navigate("/learnerdashboard");
+      } else if (userRole === "superadmin") {
+        // window.cookies.set("cook", jwt);
+        return navigate("/superadmindashboard");
       }
-      // window.cookies.set("cook", jwt);
-      navigate("/superadmindashboard");
+      // // window.cookies.set("cook", jwt);
+      // navigate("/superadmindashboard");
     }
     if (responseStatus === 400) {
       console.log("loginErrorMessage: ", loginErrorMessage);
@@ -165,13 +162,13 @@ const Login = () => {
           >
             Continue
           </button>
-          <p className="mt-5 mb-3 text-muted">
+          {/* <p className="mt-5 mb-3 text-muted">
             Don't have an account?{" "}
             <Link to="/signup" className="text-decoration-none">
               {" "}
               <span className="span-text ">Sign Up</span>{" "}
             </Link>
-          </p>
+          </p> */}
         </form>
       </main>
     </div>

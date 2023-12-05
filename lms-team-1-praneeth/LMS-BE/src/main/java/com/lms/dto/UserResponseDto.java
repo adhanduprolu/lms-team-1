@@ -1,5 +1,7 @@
 package com.lms.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,8 @@ public class UserResponseDto {
 
 	private String image;
 
+	@JsonIgnoreProperties({"useremail","username"})
+	private UserCoursesDto userCourses;
 	
 	
 }

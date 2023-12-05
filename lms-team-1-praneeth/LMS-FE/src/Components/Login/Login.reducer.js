@@ -26,6 +26,7 @@ const loginReducer = (state = initialState, action) => {
         errorMessage: "",
         jwt: action.payload.token,
         role: action.payload.roles,
+        userCourses: action.payload.userCourses.courseslist,
         /////
         // userid:action.payload._id
       };

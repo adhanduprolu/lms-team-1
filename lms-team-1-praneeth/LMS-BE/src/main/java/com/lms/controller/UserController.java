@@ -107,11 +107,13 @@ public class UserController {
 					img = output.get().getName().substring(0, 2).toUpperCase();
 				}
 
+				UserCoursesDto uc = lus.getCourseUsers(output.get().getName());
+
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
 
 				UserResponseDto ld2 = new UserResponseDto(output.get().getId(), output.get().getName(), jwt.getEmail(),
-						genJwtToken, output.get().getRoles(), img);
+						genJwtToken, output.get().getRoles(), img, uc);
 
 				return ResponseEntity.ok().headers(headers).body(ld2);
 			} else {
