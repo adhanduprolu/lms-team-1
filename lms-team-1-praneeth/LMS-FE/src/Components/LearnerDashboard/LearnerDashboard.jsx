@@ -3,12 +3,8 @@ import Header from '../Header'
 import './LearnerDashboard.css';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
-
-
 const Dashboard = () => {  
-  const courses = useSelector((state)=>state.login.userCourses)  
-  console.log(courses) 
+  const courses = useSelector((state)=>state.login.userCourses?.courseslist)       
   return (
     <div>
       <Header/>

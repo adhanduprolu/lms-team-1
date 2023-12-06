@@ -19,7 +19,7 @@ function Header(){
                 <div className='position-relative'>
                 <h3 className="rounded-circle bg-secondary text-white fs-5 m-0" style={{padding: '15px 17px', fontWeight:'400' }}>{userEmail[0]?.toUpperCase()}{userEmail[1]?.toUpperCase()}</h3>
                     <div className="profile-popup bg-white ">
-                        <Link  className='text-decoration-none text-dark' to='/myprofile'><p><i class="fa-solid fa-user me-2"/>My Profile</p></Link>
+                        <Link className='text-decoration-none text-dark' to='/myprofile'><p><i class="fa-solid fa-user me-2"/>My Profile</p></Link>
                         <Link className='text-decoration-none text-dark' to='/' onClick={()=>localStorage.clear()}><p><i class="fa-solid fa-right-from-bracket me-2"/>Sign Out</p></Link>
                     </div>
                 </div>

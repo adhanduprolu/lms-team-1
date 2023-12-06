@@ -1,6 +1,7 @@
 package com.lms.dto;
 
-import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
@@ -20,15 +21,18 @@ public class VideoDto {
 	private String name;
 	
 	@NotEmpty(message = "videoname cannot be empty")
-	private Set<String> videoname;
+	private List<String> videoname;
 
 	@Positive(message = "modulenum cannot be negative or empty")
 	private int modulenum;
 	
 	@NotEmpty(message = "videolink cannot be empty")
-	private Set<String> videolink;
+	private LinkedHashSet<String> videolink;
 
 	@NotEmpty(message = "tname cannot be empty")
 	private String tname;
 
+	
+	
+	
 }

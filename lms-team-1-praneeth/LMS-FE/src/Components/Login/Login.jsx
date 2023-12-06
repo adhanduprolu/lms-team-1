@@ -26,10 +26,13 @@ const Login = () => {
     console.log("state:", state);
     return state.login.email;
   });
+  const password = useSelector((state) => state.login.password);
   const jwt = useSelector((state) => state.login.jwt);
   const userRole = useSelector((state) => state.login.role);
   const userName = useSelector((state) => state.login.name);
   console.log("role:", userRole);
+  console.log("jwt:", jwt);
+  console.log("pw :", password);
   console.log("name :", userName);
   //FORM HANDLING AND GETTING INPUT DATA FROM USER
   const handleChange = (e) => {

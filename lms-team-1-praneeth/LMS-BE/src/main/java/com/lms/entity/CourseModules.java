@@ -34,6 +34,7 @@ public class CourseModules {
 
 	private int modulenum;
 
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private String videoinserttime;
 
 //	@ElementCollection(fetch = FetchType.EAGER)

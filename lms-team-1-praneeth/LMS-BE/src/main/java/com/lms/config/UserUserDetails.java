@@ -1,4 +1,4 @@
-package com.lms.serviceImpl;
+package com.lms.config;
 
 import java.util.Arrays;
 import java.util.Collection;

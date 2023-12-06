@@ -5,6 +5,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,8 +37,10 @@ import com.lms.repository.OtpRepo;
 import com.lms.repository.UserRepo;
 import com.lms.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
-//@Slf4j
+@Slf4j
 public class UserServiceImpl implements UserService {
 
 	@Autowired
@@ -247,7 +252,7 @@ public class UserServiceImpl implements UserService {
 
 		if (userExists && courseExists) {
 
-			CourseUsers fun = ucr.findByusername(name);
+			CourseUsers fun = ucr.findByuseremail(name);
 			List<Courses> fcn = cr.findBycoursename(cname);
 
 			Optional<Courses> courseOptional = fcn.stream()
@@ -269,7 +274,8 @@ public class UserServiceImpl implements UserService {
 	public UserCoursesDto getCourseUsers(String name) {
 
 		try {
-			CourseUsers fun = ucr.findByusername(name);
+			CourseUsers fun = ucr.findByuseremail(name);
+
 			UserCoursesDto ucd = UserCoursesDto.builder().username(fun.getUsername()).useremail(fun.getUseremail())
 					.courseslist(fun.getCourseslist()).build();
 
@@ -300,56 +306,103 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String addVideoLink(VideoDto vd) {
 
-		// find the details from db using cname, trainername
-		List<Courses> fcn = cr.findBycoursenameAndcoursetrainer(vd.getCname(), vd.getTname());
+		LinkedHashSet<String> videolink = vd.getVideolink();
 
-		CourseLink cl = CourseLink.builder().link(vd.getVideolink()).videoname(vd.getVideoname()).build();
+		List<String> videoname = vd.getVideoname();
+		List<String> linklist = new ArrayList<>(videolink);
 
-		List<CourseLink> cl1 = new ArrayList<>();
-		cl1.add(cl);
+		if (videoname.size() < videolink.size() || videolink.size() > videoname.size()) {
+			throw new CustomException("Video Title or Video Link Is Missing");
+		} else {
+			LinkedHashMap<String, String> linkedmap = new LinkedHashMap<>();
 
-		// converting the details into cm object
-		CourseModules cm = CourseModules.builder().modulenum(vd.getModulenum())
-				.videoinserttime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy "))).clinks(cl1)
-				.build();
+			Iterator<String> nameIterator = videoname.iterator();
+			Iterator<String> linkIterator = linklist.iterator();
 
-		// if fcn contains
-		if (fcn.size() > 0) {
+			while (nameIterator.hasNext() && linkIterator.hasNext()) {
+				String name = nameIterator.next();
+				String link = linkIterator.next();
+				linkedmap.put(name, link);
+			}
+			// find the details from db using cname, trainername
+			List<Courses> fcn = cr.findBycoursenameAndcoursetrainer(vd.getCname(), vd.getTname());
 
-			// by using tname gettiing the course object
-			Courses courses = fcn.stream().filter(course -> course.getCoursetrainer().equals(vd.getTname())).findFirst()
-					.get();
+			CourseLink cl = CourseLink.builder().link(linklist).videoname(vd.getVideoname()).build();
 
-			// getting the coursemodules from courses
-			List<CourseModules> existingModules = courses.getCoursemodule();
-			// if courses are already exist the it goes inside else outside
-			if (existingModules.size() > 0) {
+			List<CourseLink> cl1 = new ArrayList<>();
+			cl1.add(cl);
 
-				// check the modulenum from db and from client if both are same then return the
-				// coursemodule list
-				Optional<CourseModules> em = existingModules.stream()
-						.filter(module -> module.getModulenum() == vd.getModulenum()).findFirst();
+			// converting the details into cm object
+			CourseModules cm = CourseModules.builder().modulenum(vd.getModulenum())
+					.videoinserttime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy "))).clinks(cl1)
+					.build();
 
-				// add the videolink to set of link if the module if present or else add the
-				// builder to existingmocules list
-				if (em.isPresent()) {
-					em.get().getClinks().addAll(cl1);
+			// if fcn contains
+			if (fcn.size() > 0) {
+
+				// by using tname gettiing the course object
+				Courses courses = fcn.stream().filter(course -> course.getCoursetrainer().equals(vd.getTname()))
+						.findFirst().get();
+
+				// getting the coursemodules from courses
+				List<CourseModules> existingModules = courses.getCoursemodule();
+
+				// if courses are already exist the it goes inside else outside
+				if (existingModules.size() > 0) {
+
+					// check the modulenum from db and from client if both are same then return the
+					// coursemodule list
+					Optional<CourseModules> em = existingModules.stream()
+							.filter(module -> module.getModulenum() == vd.getModulenum()).findFirst();
+
+					// add the videolink to set of link if the module if present or else add the
+					// builder to existingmocules list
+
+					if (em.isPresent()) {
+
+						CourseModules cm1 = em.get();
+//
+						List<CourseLink> clinks = cm1.getClinks();
+//
+//						log.info("" + clinks);
+//
+//						clinks.addAll(cl1);
+//
+//						log.info("" + clinks);
+//						cm1.setClinks(clinks);
+//						log.info("" + cm1);
+
+						log.info("" + clinks);
+
+						if (clinks.size() > 0) {
+							for (CourseLink existingCl : clinks) {
+								log.info("" + existingCl);
+								existingCl.getLink().addAll(cl.getLink());
+								existingCl.getVideoname().addAll(cl.getVideoname());
+							}
+						} else {
+
+							clinks.addAll(cl1);
+
+						}
+
+					} else {
+
+						existingModules.add(cm);
+						// log.info("" +existingModules);
+					}
+
 				} else {
 					existingModules.add(cm);
 				}
+				// set the course object with new setcoursemodule
+				courses.setCoursemodule(existingModules);
+				cr.save(courses);
 
+				return "Video Saved";
 			} else {
-
-				existingModules.add(cm);
-
+				return "Video Not Saved";
 			}
-			// set the course object with new setcoursemodule
-			courses.setCoursemodule(existingModules);
-			cr.save(courses);
-
-			return "Video Saved";
-		} else {
-			return "Video Not Saved";
 		}
 
 	}
@@ -358,7 +411,7 @@ public class UserServiceImpl implements UserService {
 	public List<CourseModules> getVideoLink(String name, String cname, String tname) {
 
 		try {
-			CourseUsers courseUsers = ucr.findByusername(name);
+			CourseUsers courseUsers = ucr.findByuseremail(name);
 
 			List<CourseModules> collect = courseUsers.getCourseslist().stream()
 					.filter(fil -> fil.getCoursename().equals(cname) && fil.getCoursetrainer().equals(tname))

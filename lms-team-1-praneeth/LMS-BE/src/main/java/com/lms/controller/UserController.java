@@ -2,9 +2,14 @@ package com.lms.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.DataFormatException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,26 +32,30 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.lms.config.JwtService;
 import com.lms.dto.AllCourseUsersDto;
 import com.lms.dto.UserCoursesDto;
 import com.lms.dto.UserDto;
 import com.lms.dto.UserResponseDto;
 import com.lms.dto.UserVerifyDto;
 import com.lms.dto.VideoDto;
+import com.lms.entity.CourseLink;
 import com.lms.entity.CourseModules;
 import com.lms.entity.CourseUsers;
 import com.lms.entity.Courses;
+import com.lms.entity.CoursesViewDto;
+import com.lms.entity.CoursesViewDto.CoursesViewDtoBuilder;
 import com.lms.entity.User;
 import com.lms.exception.details.CustomException;
 import com.lms.exception.details.EmailNotFoundException;
 import com.lms.service.UserService;
 import com.lms.serviceImpl.EmailService;
-import com.lms.serviceImpl.JwtService;
 import com.lms.serviceImpl.OtpService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 
+//@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -109,7 +118,7 @@ public class UserController {
 
 				UserCoursesDto uc = null;
 				try {
-					uc = lus.getCourseUsers(output.get().getName());
+					uc = lus.getCourseUsers(output.get().getEmail());
 
 				} catch (Exception e) {
 
@@ -315,12 +324,49 @@ public class UserController {
 	}
 
 	@GetMapping("/getvideos")
-	public ResponseEntity<List<CourseModules>> gsvh(@RequestParam String name, @RequestParam String cname,
+	public ResponseEntity<List<CoursesViewDto>> getVideo(@RequestParam String name, @RequestParam String cname,
 			@RequestParam String tname) {
 
 		List<CourseModules> videoLink = lus.getVideoLink(name, cname, tname);
 
-		return new ResponseEntity<List<CourseModules>>(videoLink, HttpStatus.OK);
+		List<Integer> mn = videoLink.stream().map(x -> x.getModulenum()).collect(Collectors.toList());
+
+		List<List<CourseLink>> collect = videoLink.stream().map(x -> x.getClinks()).collect(Collectors.toList());
+
+		List<List<CourseLink>> findFirst = collect.stream().toList();
+
+		List<List<String>> listoflinks = findFirst.stream().flatMap(clinks -> clinks.stream().map(CourseLink::getLink))
+				.collect(Collectors.toList());
+
+		List<List<String>> listofvideonames = findFirst.stream()
+				.flatMap(clinks -> clinks.stream().map(CourseLink::getVideoname)).collect(Collectors.toList());
+
+//		Collections.reverse(listofvideonames);
+
+		List<Map<String, String>> resultMapList = new ArrayList<>();
+
+		for (int i = 0; i < listoflinks.size(); i++) {
+			List<String> list2 = listoflinks.get(i);
+			List<String> list3 = listofvideonames.get(i);
+
+			Map<String, String> resultMap = new HashMap<>();
+
+			for (int j = 0; j < list2.size(); j++) {
+
+				resultMap.put(list3.get(j), list2.get(j));
+			}
+
+			resultMapList.add(resultMap);
+		}
+
+		List<CoursesViewDtoBuilder> combinedList = IntStream.range(0, Math.min(mn.size(), resultMapList.size()))
+				.mapToObj(i -> CoursesViewDto.builder().modulenum(mn.get(i)).videos(resultMapList.get(i)))
+				.collect(Collectors.toList());
+
+		List<CoursesViewDto> list = combinedList.stream().map(CoursesViewDtoBuilder::build)
+				.collect(Collectors.toList());
+
+		return new ResponseEntity<List<CoursesViewDto>>(list, HttpStatus.OK);
 	}
 
 }

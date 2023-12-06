@@ -21,8 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import com.lms.serviceImpl.UserUserdetailsService;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletRequest;
 
