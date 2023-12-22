@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    stages {
+        stage('Clone a Repo') {
+            steps {
+                git branch: 'test', url: 'https://github.com/adhanduprolu/lms-team-1.git'
+            }
+        }
+
+        stage('Database Container Setup') {
+            steps {
+                script {
+                    def containerExists = sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true)
+                    if (containerExists == 0) {
+                        echo 'MySQL container already exists'
+                    } else {
+                        sh 'docker container run -d --name mysql --network lmsnetwork -e MYSQL_ROOT_PASSWORD=Qwerty@123 -p 3306:3306 mysql:latest'
+                    }
+                }
+            }
+        }
+
+        stage('Backend Container Setup') {
+            steps { 
+                script {
+                    def containerExists = sh(script: 'docker inspect -f {{.State.Running}} backend', returnStatus: true)
+                    if (containerExists == 0) {
+                        echo 'Backend container already exists'
+                    } else {
+                        dir('LMS-BE') {
+                            sh 'docker build -t dockerfile .'
+                            sh 'docker run -dt --name backend -p 8080:8080 dockerfile'
+                            sh 'sudo systemctl daemon-reload'
+                            sh 'sudo systemctl start lms-be'
+                            sh 'sudo systemctl enable lms-be'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
