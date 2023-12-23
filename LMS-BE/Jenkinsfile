@@ -4,7 +4,8 @@ pipeline {
         stage('Database Container Setup') {
             steps {
                 script {
-                    if (sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true) == 0) {
+                    def mysqlContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true)
+                    if (mysqlContainerStatus == 0) {
                         echo 'MySQL container already exists'
                     } else {
                         sh 'docker container run -d --name mysql --network lmsnetwork -e MYSQL_ROOT_PASSWORD=Qwerty@123 -p 3306:3306 mysql:latest'
@@ -15,12 +16,10 @@ pipeline {
 
         stage('Backend Container Setup') {
             steps {
-                        dir('LMS-BE') {
-                            sh 'docker build -t dockerfile .'
-                            sh 'docker run -dt --name backend -p 8080:8080 dockerfile'
-                            sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
-                        }
-                    }
+                dir('LMS-BE') {
+                    sh 'docker build -t dockerfile .'
+                    sh 'docker run -dt --name backend -p 8080:8080 dockerfile'
+                    sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
                 }
             }
         }
