@@ -16,10 +16,14 @@ pipeline {
 
         stage('Backend Container Setup') {
             steps {
-                dir('LMS-BE') {
-                    sh 'docker build -t dockerfile .'
-                    sh 'docker run -dt --name backend -p 8080:8080 dockerfile'
-                    sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
+                script {
+                    sh 'docker stop backend || true'
+                    sh 'docker rm backend || true'
+                    dir('LMS-BE') {
+                        sh 'docker build -t dockerfile .'
+                        sh 'docker run -dt --name backend -p 8080:8080 dockerfile'
+                        sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
+                    }
                 }
             }
         }
