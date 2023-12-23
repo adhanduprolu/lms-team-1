@@ -20,8 +20,8 @@ pipeline {
                     sh 'docker stop backend || true'
                     sh 'docker rm backend || true'
                     dir('LMS-BE') {
-                        sh 'docker build -t dockerfile .'
-                        sh 'docker run -dt --name backend -p 8080:8080 dockerfile'
+                        sh 'docker build -t backend .'
+                        sh 'docker run -dt --name backend -p 8080:8080 backend'
                         sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
                     }
                 }
