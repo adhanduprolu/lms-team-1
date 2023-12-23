@@ -12,8 +12,8 @@ pipeline {
                     } else {
                         dir('lms-fe/lmsv1') {
                             try {
-                                sh 'docker build -t dockerfile .'
-                                sh 'docker run -dt --name frontend -p 80:80 dockerfile'
+                                sh 'docker build -t frontend .'
+                                sh 'docker run -dt --name frontend -p 80:80 frontend'
                             } catch (Exception e) {
                                 error("Error building or running the frontend container: ${e.message}")
                             }
