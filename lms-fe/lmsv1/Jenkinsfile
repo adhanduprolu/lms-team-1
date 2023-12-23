@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Frontend Container Setup') {
+            steps {
+                script {
+                    def frontendContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} frontend', returnStatus: true)
+
+                    if (frontendContainerStatus == 0) {
+                        echo 'Frontend container already exists'
+                    } else {
+                        dir('lms-fe/lmsv1') {
+                            try {
+                                sh 'docker build -t dockerfile .'
+                                sh 'docker run -dt --name frontend -p 80:80 dockerfile'
+                            } catch (Exception e) {
+                                error("Error building or running the frontend container: ${e.message}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
