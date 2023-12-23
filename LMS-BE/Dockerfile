@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . .
 # Build the application with Maven
-RUN ./mvnw package
+RUN ./mvnw clean package
 # Expose the port the app runs on
 EXPOSE 8080
 # Command to run the application
