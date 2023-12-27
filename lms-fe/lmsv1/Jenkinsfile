@@ -15,11 +15,59 @@ pipeline {
                                 sh 'docker build -t frontend .'
                                 sh 'docker run -dt --name frontend -p 80:80 frontend'
                             } catch (Exception e) {
-                                error("Error building or running the frontend container: ${e.message}")
+                                error "Error building or running the frontend container: ${e.message}"
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                slackSend(
+                    channel: 'jenkins-notifications',
+                    color: 'good',
+                    message: 'Congratulations! Front-end job succeeded. Thanks, Anjan',
+                    tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
+                )
+                slackUploadFile(
+                    channel: 'jenkins-notifications',
+                    credentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d',
+                    filePath: 'app/frontend'
+                )
+                emailext(
+                    body: '''Building lms application frontend job succeeded. 
+                        Check the browser with your IP or domain name.
+
+                        Thank you,
+                        Anjan''',
+                    recipientProviders: [buildUser()],
+                    subject: 'Build Successful !! lms_frontend',
+                    to: 'anjan.dhanduprolu@gmail.com'
+                )
+            }
+        }
+        failure {
+            script {
+                slackSend(
+                    channel: 'jenkins-notifications',
+                    color: 'danger',
+                    message: 'Oops! Front-end job failed. Check the job configurations. Thanks, Anjan - Job failed',
+                    tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
+                )
+                emailext(
+                    body: '''Building lms application frontend job failed. 
+                        Check job configuration.
+
+                        Thank you,
+                        Anjan''',
+                    recipientProviders: [buildUser()],
+                    subject: 'Build failed !! lms_frontend',
+                    to: 'anjan.dhanduprolu@gmail.com'
+                )
             }
         }
     }
