@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage('Database Container Setup') {
             steps {
@@ -19,12 +20,42 @@ pipeline {
                 script {
                     sh 'docker stop backend || true'
                     sh 'docker rm backend || true'
+
                     dir('LMS-BE') {
-                        sh 'docker build -t backend .'
-                        sh 'docker run -dt --name backend -p 8080:8080 backend'
-                        sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
+                        try {
+                            sh 'docker build -t backend .'
+                            sh 'docker run -dt --name backend -p 8080:8080 backend'
+                            sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
+                        } catch (Exception e) {
+                            error "Error building or running the backend container: ${e.message}"
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                slackSend(
+                    channel: 'jenkins-notifications',
+                    color: 'good',
+                    message: 'Congratulations! Backend job succeeded. Thanks, Anjan',
+                    tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
+                )
+                // Add other success notifications or actions here
+            }
+        }
+        failure {
+            script {
+                slackSend(
+                    channel: 'jenkins-notifications',
+                    color: 'danger',
+                    message: 'Oops! Backend job failed. Check the job configurations. Thanks, Anjan - Job failed',
+                    tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
+                )
+                // Add other failure notifications or actions here
             }
         }
     }
