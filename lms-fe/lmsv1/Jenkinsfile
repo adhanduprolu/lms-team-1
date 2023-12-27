@@ -30,7 +30,7 @@ pipeline {
                 slackSend(
                     channel: 'jenkins-notifications',
                     color: 'good',
-                    message: 'Congratulations! Front-end job succeeded. Thanks, Anjan',
+                    message: 'Congratulations! Frontend job succeeded. Thanks, Anjan',
                     tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
                 )
                 slackUploadFile(
@@ -46,7 +46,7 @@ pipeline {
                         Anjan''',
                     recipientProviders: [buildUser()],
                     subject: 'Build Successful !! lms_frontend',
-                    to: 'anjan.dhanduprolu@gmail.com'
+                    to: 'adhanduprolu@gmail.com'
                 )
             }
         }
@@ -55,7 +55,7 @@ pipeline {
                 slackSend(
                     channel: 'jenkins-notifications',
                     color: 'danger',
-                    message: 'Oops! Front-end job failed. Check the job configurations. Thanks, Anjan - Job failed',
+                    message: 'Oops! Frontend job failed. Check the job configurations. Thanks, Anjan - Job failed',
                     tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
                 )
                 emailext(
@@ -66,7 +66,7 @@ pipeline {
                         Anjan''',
                     recipientProviders: [buildUser()],
                     subject: 'Build failed !! lms_frontend',
-                    to: 'anjan.dhanduprolu@gmail.com'
+                    to: 'adhanduprolu@gmail.com'
                 )
             }
         }
