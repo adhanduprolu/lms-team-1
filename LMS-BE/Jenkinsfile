@@ -37,5 +37,31 @@ pipeline {
                 }
             }
         }
+
+        stage('Remove Old Backend Container') {
+            steps {
+                script {
+                    sh 'docker stop backend || true'
+                    sh 'docker rm backend || true'
+                    echo 'Old backend container removed'
+                }
+            }
+        }
+
+        stage('Create Backend Container') {
+            steps {
+                script {
+                    dir('LMS-BE') {
+                        try {
+                            sh 'docker build -t backend .'
+                            sh 'docker run -dt --name backend -p 8080:8080 backend'
+                            echo 'Backend container created'
+                        } catch (Exception e) {
+                            error "Error building or running the backend container: ${e.message}"
+                        }
+                    }
+                }
+            }
+        }
     }
 }
