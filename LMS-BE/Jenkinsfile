@@ -10,20 +10,13 @@ pipeline {
 
         stage('Remove Old Image') {
             steps {
-                sh 'docker rmi -f adhanduprolu/mysql:latest'
+                sh 'docker rmi -f adhanduprolu/mysql'
             }
         }
 
         stage('Docker Build MySQL') {
             steps {
-                script {
-                    import docker
-
-client = docker.from_env()
-client.images.pull('adhanduprolu/mysql:latest')
-client.containers.run('adhanduprolu/mysql:latest', name='mysql', ports={'3306/tcp': 3306}, environment={'MYSQL_ROOT_PASSWORD': 'Qwerty@123'}, remove=True, detach=True)
-
-                }
+                sh 'docker run -dt --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=Qwerty@123 mysql:latest'
             }
         }
     }
