@@ -2,29 +2,38 @@ pipeline {
     agent any
 
     stages {
-    stage('Remove Old Database Container') {
-        steps {
-            script {
-                def mysqlContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true)
-                if (mysqlContainerStatus == 0) {
-                    sh 'docker stop mysql'
-                    sh 'docker rm mysql'
-                    echo 'Old MySQL container removed'
-                } else {
-                    echo 'No existing MySQL container found'
+        stage('Remove Old Database Container') {
+            steps {
+                script {
+                    try {
+                        def mysqlContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true)
+                        if (mysqlContainerStatus == 0) {
+                            sh 'docker stop mysql'
+                            sh 'docker rm mysql'
+                            echo 'Old MySQL container removed'
+                        } else {
+                            echo 'No existing MySQL container found'
+                        }
+                    } catch (Exception e) {
+                        echo "Error: ${e.message}"
+                    }
                 }
             }
         }
-    }
 
-    stage('Create Database Container') {
-        steps {
-            script {
-                def mysqlContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true)
-                if (mysqlContainerStatus == 0) {
-                    echo 'MySQL container already exists'
-                } else {
-                    sh 'docker run -dt --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=Qwerty@123 mysql:latest'
+        stage('Create Database Container') {
+            steps {
+                script {
+                    try {
+                        def mysqlContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} mysql', returnStatus: true)
+                        if (mysqlContainerStatus == 0) {
+                            echo 'MySQL container already exists'
+                        } else {
+                            sh 'docker run -dt --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=Qwerty@123 mysql:latest'
+                        }
+                    } catch (Exception e) {
+                        echo "Error: ${e.message}"
+                    }
                 }
             }
         }
