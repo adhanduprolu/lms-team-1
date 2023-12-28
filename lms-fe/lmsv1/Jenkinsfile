@@ -2,7 +2,23 @@ pipeline {
     agent any
 
     stages {
-        stage('Frontend Container Setup') {
+        stage('Remove Old Frontend Container') {
+            steps {
+                script {
+                    def frontendContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} frontend', returnStatus: true)
+
+                    if (frontendContainerStatus == 0) {
+                        sh 'docker stop frontend'
+                        sh 'docker rm frontend'
+                        echo 'Old frontend container removed'
+                    } else {
+                        echo 'No existing frontend container found'
+                    }
+                }
+            }
+        }
+
+        stage('Create Frontend Container') {
             steps {
                 script {
                     def frontendContainerStatus = sh(script: 'docker inspect -f {{.State.Running}} frontend', returnStatus: true)
@@ -14,6 +30,7 @@ pipeline {
                             try {
                                 sh 'docker build -t frontend .'
                                 sh 'docker run -dt --name frontend -p 80:80 frontend'
+                                echo 'Frontend container created'
                             } catch (Exception e) {
                                 error "Error building or running the frontend container: ${e.message}"
                             }
