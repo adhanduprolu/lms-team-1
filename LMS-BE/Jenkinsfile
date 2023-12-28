@@ -1,6 +1,12 @@
 pipeline {
     agent any
+environment {
 
+    DOCKERHUB_CREDENTIALS = credentials('yoursureshdockerhub')
+     registry = "adhanduprolu"
+        registryCredential = 'Dhandu0$o'
+        dockerImage = ''
+    }
     stages {
         stage('Docker Hub Login') {
             steps {
