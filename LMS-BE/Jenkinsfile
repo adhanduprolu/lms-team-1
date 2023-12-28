@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     stages {
+        stage('Remove Old Image') {
+            steps {
+                sh 'docker rmi -f adhanduprolu/mysql:latest'
+            }
+        }
         stage('Docker Pull MySQL') {
             steps {
                 sh 'docker pull adhanduprolu/mysql:latest'
-            }
-        }
-
-        stage('Remove Old Image') {
-            steps {
-                sh 'docker rmi -f adhanduprolu/mysql'
             }
         }
 
