@@ -64,4 +64,59 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            script {
+                // Slack notification on success
+                slackSend(
+                    channel: 'jenkins-notifications',
+                    color: 'good',
+                    message: 'Congratulations! Backend job succeeded. Thanks, Anjan',
+                    tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
+                )
+                
+                // Slack file upload on success
+                slackUploadFile(
+                    channel: 'jenkins-notifications',
+                    credentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d',
+                    filePath: 'app/backend'
+                )
+                
+                // Email notification on success
+                emailext(
+                    body: '''Building lms application backend job succeeded. 
+                        
+                        Thank you,
+                        Anjan''',
+                    recipientProviders: [buildUser()],
+                    subject: 'Build Successful !! lms_backend',
+                    to: 'ahanduprolu@gmail.com'
+                )
+            }
+        }
+        failure {
+            script {
+                // Slack notification on failure
+                slackSend(
+                    channel: 'jenkins-notifications',
+                    color: 'danger',
+                    message: 'Oops! Backend job failed. Check the job configurations. Thanks, Anjan - Job failed',
+                    tokenCredentialId: '33827e16-d985-4461-b3b9-70fc4a21f63d'
+                )
+                
+                // Email notification on failure
+                emailext(
+                    body: '''Building lms application backend job failed. 
+                        Check job configuration.
+
+                        Thank you,
+                        Anjan''',
+                    recipientProviders: [buildUser()],
+                    subject: 'Build failed !! lms_backend',
+                    to: 'adhanduprolu@gmail.com'
+                )
+            }
+        }
+    }
 }
