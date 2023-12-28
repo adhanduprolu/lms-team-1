@@ -1,19 +1,19 @@
 pipeline {
     agent any
 
-   
-
+    stages {
         stage('Docker Pull MySQL') {
             steps {
                 sh 'docker pull adhanduprolu/mysql:latest'
             }
         }
- stages {
+
         stage('Remove Old Image') {
             steps {
                 sh 'docker rmi -f adhanduprolu/mysql:latest'
             }
         }
+
         stage('Docker Build MySQL') {
             steps {
                 sh 'docker run -dt --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=Qwerty@123 adhanduprolu/mysql:latest'
