@@ -25,7 +25,6 @@ pipeline {
                         try {
                             sh 'docker build -t backend .'
                             sh 'docker run -dt --name backend -p 8080:8080 backend'
-                            sh 'sudo systemctl daemon-reload && sudo systemctl start lms-be && sudo systemctl enable lms-be'
                         } catch (Exception e) {
                             error "Error building or running the backend container: ${e.message}"
                         }
