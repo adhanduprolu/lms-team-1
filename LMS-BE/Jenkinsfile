@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+    stages {
         stage('Remove Old Image') {
             steps {
                 sh 'docker rmi -f adhanduprolu/mysql:latest'
