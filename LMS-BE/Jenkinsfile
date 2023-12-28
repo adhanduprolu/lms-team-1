@@ -1,22 +1,5 @@
 pipeline {
     agent any
-environment {
-
-    DOCKERHUB_CREDENTIALS = credentials('yoursureshdockerhub')
-     registry = "adhanduprolu"
-        registryCredential = 'Dhandu0$o'
-        dockerImage = ''
-    }
-    stages {
-        stage('Docker Hub Login') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'yourCredentialsId', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR')]) {
-                        sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
-                    }
-                }
-            }
-        }
 
         stage('Remove Old Image') {
             steps {
