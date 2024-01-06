@@ -10,7 +10,7 @@ import { EmailService } from './email.service';
 })
 export class AuthService {
 
-  private baseUrl = 'http://localhost:8080';
+  private baseUrl = 'http://18.191.204.177:8080';
 
   capitalizedEmail: string = '';
   // status: string = '';
